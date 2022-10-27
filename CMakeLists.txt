@@ -152,6 +152,7 @@ if(NOT WIN32) # no PkgConfig on Windows...
 endif()
 
 find_package(Threads REQUIRED)
+find_package(iir)
 
 include(CMakePushCheckState)
 include(CheckIncludeFileCXX)
@@ -334,6 +335,7 @@ list(APPEND CMAKE_REQUIRED_INCLUDES "${INCLUDE_DIRS}")
 #include(${CMAKE_SOURCE_DIR}/cmake/SystemdService.cmake)
 
 add_subdirectory(common)
+add_subdirectory(external/iir)
 
 if (BUILD_SERVER)
     add_subdirectory(server)

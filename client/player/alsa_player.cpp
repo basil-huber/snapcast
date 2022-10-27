@@ -629,6 +629,7 @@ void AlsaPlayer::worker()
         {
             lastChunkTick = chronos::getTickCount();
             adjustVolume(buffer_.data(), framesAvail);
+            filter(buffer_.data(), framesAvail);
             if ((pcm = snd_pcm_writei(handle_, buffer_.data(), framesAvail)) == -EPIPE)
             {
                 LOG(ERROR, LOG_TAG) << "XRUN while writing to PCM: " << snd_strerror(pcm) << "\n";

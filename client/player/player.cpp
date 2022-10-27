@@ -50,7 +50,7 @@ namespace player
 static constexpr auto LOG_TAG = "Player";
 
 Player::Player(boost::asio::io_context& io_context, const ClientSettings::Player& settings, std::shared_ptr<Stream> stream)
-    : io_context_(io_context), active_(false), stream_(stream), settings_(settings), volume_(1.0), muted_(false), volCorrection_(1.0)
+    : io_context_(io_context), active_(false), stream_(stream), settings_(settings), volume_(1.0), muted_(false), volCorrection_(1.0), dsp_()
 {
     string sharing_mode;
     switch (settings_.sharing_mode)
@@ -178,6 +178,18 @@ void Player::adjustVolume(char* buffer, size_t frames)
         else if (sampleFormat.sampleSize() == 4)
             adjustVolume<int32_t>(buffer, frames * sampleFormat.channels(), volume);
     }
+}
+
+void Player::filter(char* buffer, size_t frames)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    const SampleFormat& sampleFormat = stream_->getFormat();
+    if (sampleFormat.sampleSize() == 1)
+        dsp_.filter<int8_t>(buffer, frames * sampleFormat.channels(), dsp::MONO, sampleFormat.rate());
+    else if (sampleFormat.sampleSize() == 2)
+        dsp_.filter<int16_t>(buffer, frames * sampleFormat.channels(), dsp::MONO, sampleFormat.rate());
+    else if (sampleFormat.sampleSize() == 4)
+        dsp_.filter<int32_t>(buffer, frames * sampleFormat.channels(), dsp::MONO, sampleFormat.rate());
 }
 
 

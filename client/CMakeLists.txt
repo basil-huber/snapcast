@@ -6,34 +6,18 @@ set(CLIENT_SOURCES
     time_provider.cpp
     decoder/pcm_decoder.cpp
     player/player.cpp
-    player/file_player.cpp)
+    player/file_player.cpp
+    player/dsp.cpp
+    player/biquad.cpp)
 
-set(CLIENT_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} ${ATOMIC_LIBRARY} common)
+set(CLIENT_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} ${ATOMIC_LIBRARY} common iir::iir_static)
 
 set(CLIENT_INCLUDE
     ${Boost_INCLUDE_DIR}
     ${CMAKE_SOURCE_DIR}/client
     ${CMAKE_SOURCE_DIR}/common)
 
-
-if(MACOSX)
-    # Bonjour
-    if (BONJOUR_FOUND)
-        list(APPEND CLIENT_SOURCES browseZeroConf/browse_bonjour.cpp)
-    endif (BONJOUR_FOUND)
-
-    # CoreAudio
-    add_definitions(-DHAS_COREAUDIO)
-    list(APPEND CLIENT_SOURCES player/coreaudio_player.cpp)
-    find_library(COREAUDIO_LIB CoreAudio)
-    find_library(COREFOUNDATION_LIB CoreFoundation)
-    find_library(IOKIT_LIB IOKit)
-    find_library(AUDIOTOOLBOX_LIB AudioToolbox)
-    list(APPEND CLIENT_LIBRARIES ${COREAUDIO_LIB} ${COREFOUNDATION_LIB} ${IOKIT_LIB} ${AUDIOTOOLBOX_LIB})
-elseif (WIN32)
-    list(APPEND CLIENT_SOURCES player/wasapi_player.cpp)
-    list(APPEND CLIENT_LIBRARIES wsock32 ws2_32 avrt ksuser iphlpapi)
-elseif(NOT ANDROID)
+if(NOT ANDROID)
     # Avahi
     if (AVAHI_FOUND)
         list(APPEND CLIENT_SOURCES browseZeroConf/browse_avahi.cpp)

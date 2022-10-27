@@ -23,6 +23,7 @@
 #include "common/aixlog.hpp"
 #include "common/endian.hpp"
 #include "stream.hpp"
+#include "dsp.hpp"
 
 #include <boost/asio.hpp>
 
@@ -85,6 +86,7 @@ protected:
     void setVolume_exp(double volume, double base);
 
     void adjustVolume(char* buffer, size_t frames);
+    void filter(char* buffer, size_t frames);
 
     /// Notify the server about hardware volume changes
     /// @param volume the volume in range [0..1]
@@ -107,6 +109,7 @@ protected:
     mutable std::mutex mutex_;
 
 private:
+    dsp::DSP dsp_;
     template <typename T>
     void adjustVolume(char* buffer, size_t count, double volume)
     {
